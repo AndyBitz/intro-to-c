@@ -203,7 +203,7 @@ int main() {
 	}
 	printf("\n");
 
-	// TODO: Verify if this is correct
+	// Created this key from a Node.js script with createCipheriv + aes-128-ecb + null as iv
 	char *expected = "8C8CBCA4CF0F694BC13C925FC8F5820D92C51FDD3027EAB45887AEE2BECF8905";
 	printf("Expected: %s\n", expected);
 
