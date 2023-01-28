@@ -94,6 +94,14 @@ void print_roundkeys(uint8_t *roundkeys) {
 	printf("\n\n");
 }
 
+void print_data(uint8_t *data) {
+	printf("Data:     ");
+	for (int i = 0; i < 32; i++) {
+		printf("%02X", data[i]);
+	}
+	printf("\n");
+}
+
 int main() {
 	int rounds = 10;
 	int block_size = 16;
@@ -172,9 +180,12 @@ int main() {
 	// Encrypt the data
 	// Iterate over each data block
 	for (int i = 0; i < output_size / 16; i++) {
-		// TODO: Does key expansion happen here for each block, or only once upfront?
+		printf("Encrypt block %i\n", i);
 
 		uint8_t *block = ((uint8_t *) output) + i * block_size;
+
+		// TODO: Does key expansion happen here for each block, or only once upfront?
+		// Would that even matter?
 
 		// Initial AddRoundKey step
 		add_round_key((uint8_t *) roundkeys, block);
@@ -193,15 +204,14 @@ int main() {
 
 			// AddRoundKey - r * 16 to get to the next key
 			add_round_key(((uint8_t *) roundkeys) + r * 16, block);
+
+			print_data(output);
 		}
 	}
 
 	// Print the final output in hex format
-	printf("Created:  ");
-	for (int i = 0; i < alloc; i++) {
-		printf("%02X", output[i]);
-	}
 	printf("\n");
+	print_data(output);
 
 	// Created this key from a Node.js script with createCipheriv + aes-128-ecb + null as iv
 	char *expected = "8C8CBCA4CF0F694BC13C925FC8F5820D92C51FDD3027EAB45887AEE2BECF8905";
