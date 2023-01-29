@@ -100,7 +100,7 @@ void print_roundkeys(uint8_t *roundkeys) {
 
 void print_data(uint8_t *data) {
 	printf("Data:     ");
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 32; i++) {
 		printf("%02X", data[i]);
 	}
 	printf("\n");
@@ -110,10 +110,10 @@ int main() {
 	int rounds = 10;
 	int block_size = 16;
 
-	// char *data = "hello world, this is my secret";
-	// char *key = "k38duvhd901nd830";
-	char *data = "Two One Nine Two";
-	char *key = "Thats my Kung Fu";
+	char *data = "hello world, this is my secret";
+	char *key = "k38duvhd901nd830";
+	// char *data = "Two One Nine Two";
+	// char *key = "Thats my Kung Fu";
 
 	printf("Data: %s\n", data);
 	printf("Key: %s\n", key);
@@ -221,9 +221,10 @@ int main() {
 	print_data(output);
 
 	// Created this key from a Node.js script with createCipheriv + aes-128-ecb + null as iv
-	// char *expected = "8C8CBCA4CF0F694BC13C925FC8F5820D92C51FDD3027EAB45887AEE2BECF8905";
+	char *expected = "8C8CBCA4CF0F694BC13C925FC8F5820D92C51FDD3027EAB45887AEE2BECF8905";
 	// From https://www.simplilearn.com/tutorials/cryptography-tutorial/aes-encryption#how_does_aes_work
-	char *expected = "29C3505F571420F6402299B31A02D73AB3E46F11BA8D2B97C18769449A89E868";
+	// char *expected = "29C3505F571420F6402299B31A02D73AB3E46F11BA8D2B97C18769449A89E868";
+
 	printf("Expected: %s\n", expected);
 
 	free(roundkeys);
