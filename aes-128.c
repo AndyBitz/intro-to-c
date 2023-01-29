@@ -159,7 +159,9 @@ int main() {
 		uint32_t *rkp = ((uint32_t *) roundkeys) + offset - 4; // Previous key
 		uint32_t *rkc = ((uint32_t *) roundkeys) + offset; // Current key
 
-		rkc[0] = rkp[3]; // Take 3, because we take the word before the new current
+		// Take 3, because we take the word before the new current
+		// basically rkc[-1]
+		rkc[0] = rkp[3]; 
 
 		// Same as the code below, but easier to understand
 		/*
