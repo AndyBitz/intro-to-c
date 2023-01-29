@@ -1,3 +1,7 @@
+/**
+ * AES-128 implementation in C.
+ */
+
 #include<stdlib.h>
 #include<stdio.h>
 #include<stdint.h>
@@ -142,25 +146,24 @@ int main() {
 
 	uint8_t *output = (uint8_t *) malloc(alloc);
 	memcpy(output, data, data_size);
-	memset((char*) output + data_size, overflow, overflow); // TODO: Is the overflow correct?
+	// PKCS#7 padding, ensure the last n bytes are filled with the value n
+	memset((char*) output + data_size, overflow, overflow);
 
 	// Expand the key and create the round keys
 	size_t roundkey_size = block_size * (rounds + 1);
 	uint8_t *roundkeys = (uint8_t *) malloc(roundkey_size);
-	// memset(roundkeys, 0x3, roundkey_size);
 	memcpy(roundkeys, key, block_size);
 
 	// Create 10 additional roundkeys
 	for (int r = 1, rc = 1; r <= 10; r++, rc = mul_by_x(rc)) {
 		int offset = r * 4;
 
-		// Has to be unsigned, otherwise ROR32 might bess it up
-		// due to pulling in 0xf on bit shift on signed
+		// Has to be unsigned, otherwise ROR32 might mess it up
+		// due to pulling in 0xf on bit shift for signed types
 		uint32_t *rkp = ((uint32_t *) roundkeys) + offset - 4; // Previous key
 		uint32_t *rkc = ((uint32_t *) roundkeys) + offset; // Current key
 
-		// Take 3, because we take the word before the new current
-		// basically rkc[-1]
+		// Take 3, because we take the word before the new current basically rkc[-1]
 		rkc[0] = rkp[3]; 
 
 		// Same as the code below, but easier to understand
