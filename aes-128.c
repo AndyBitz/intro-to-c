@@ -93,7 +93,7 @@ void print_roundkeys(uint8_t *roundkeys) {
 		if (i != 0 && i % 16 == 0) printf(" ");
 		if (i != 0 && i % 48 == 0) printf("\n");
 		// printf("%c", roundkeys[i]);
-		printf("%02x", roundkeys[i]);
+		printf("%02X", roundkeys[i]);
 	}
 	printf("\n\n");
 }
@@ -196,7 +196,7 @@ int main() {
 		// Initial AddRoundKey step
 		add_round_key((uint8_t *) roundkeys, block);
 
-		for (int r = 0; r <= 10; r++) {
+		for (int r = 1; r <= 10; r++) {
 			// SubBytes
 			sub_bytes(sbox, block);
 
