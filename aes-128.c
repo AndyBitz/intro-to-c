@@ -3,8 +3,12 @@
 #include<stdint.h>
 #include<string.h>
 
-#define ROR32(x, shift) (x >> shift) | (x << (32 - shift))
 #define ROTL8(x,shift) ((uint8_t) ((x) << (shift)) | ((x) >> (8 - (shift))))
+
+// See: https://github.com/spotify/linux/blob/master/include/linux/bitops.h#L83
+uint32_t ror32(uint32_t word, unsigned int shift) {
+	return (word >> shift) | (word << (32 - shift));
+}
 
 // See: https://github.com/torvalds/linux/blob/master/lib/crypto/aes.c#L91
 uint32_t mul_by_x(uint32_t w) {
@@ -75,11 +79,11 @@ void shift_rows(uint8_t *block) {
 	block[3] = over1;
 }
 
-void mix_columns(uint8_t *block) {
+void mix_columns(uint32_t *block) {
 	for (int i = 0; i < 4; i++) {
-		uint32_t x = ((uint32_t *) block)[i];
-		uint32_t y = mul_by_x(x) ^ ROR32(x, 16);
-		((uint32_t *) block)[i] = y ^ ROR32(x ^ y, 8);
+		uint32_t x = block[i];
+		uint32_t y = mul_by_x(x) ^ ror32(x, 16);
+		block[i] = y ^ ror32(x ^ y, 8);
 	}
 }
 
@@ -96,7 +100,7 @@ void print_roundkeys(uint8_t *roundkeys) {
 
 void print_data(uint8_t *data) {
 	printf("Data:     ");
-	for (int i = 0; i < 32; i++) {
+	for (int i = 0; i < 16; i++) {
 		printf("%02X", data[i]);
 	}
 	printf("\n");
@@ -171,7 +175,7 @@ int main() {
 				 (sbox[(rkc[0] >> 16) & 0xff] << 16) ^
 				 (sbox[(rkc[0] >> 24) & 0xff] << 24);
 
-		rkc[0] = ROR32(rkc[0], 8);
+		rkc[0] = ror32(rkc[0], 8);
 
 		// Wi-N ^ S(Wi-1 << 8) ^ Ci/N-1
 		rkc[0] = rkp[0] ^ rkc[0] ^ rc;
@@ -189,9 +193,6 @@ int main() {
 
 		uint8_t *block = ((uint8_t *) output) + i * block_size;
 
-		// TODO: Does key expansion happen here for each block, or only once upfront?
-		// Would that even matter?
-
 		// Initial AddRoundKey step
 		add_round_key((uint8_t *) roundkeys, block);
 
@@ -204,7 +205,7 @@ int main() {
 
 			// MixColumns, skip if last round
 			if (r != 10) {
-				mix_columns(block);
+				mix_columns((uint32_t *) block);
 			}
 
 			// AddRoundKey - r * 16 to get to the next key
